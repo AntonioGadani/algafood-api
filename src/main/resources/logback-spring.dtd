@@ -1,0 +1,17 @@
+<!ELEMENT configuration (include,springProfile)>
+<!ELEMENT include EMPTY>
+<!ATTLIST include resource CDATA #REQUIRED>
+<!ELEMENT springProfile (springProperty,appender+,root)>
+<!ATTLIST springProfile name NMTOKEN #REQUIRED>
+<!ELEMENT springProperty EMPTY>
+<!ATTLIST springProperty name NMTOKEN #REQUIRED>
+<!ATTLIST springProperty source NMTOKEN #REQUIRED>
+<!ELEMENT appender (endpointUrl?,pattern?,appender-ref?)>
+<!ATTLIST appender name NMTOKEN #REQUIRED>
+<!ATTLIST appender class NMTOKEN #REQUIRED>
+<!ELEMENT endpointUrl (#PCDATA)>
+<!ELEMENT pattern (#PCDATA)>
+<!ELEMENT appender-ref EMPTY>
+<!ATTLIST appender-ref ref NMTOKEN #REQUIRED>
+<!ELEMENT root (appender-ref)>
+<!ATTLIST root level NMTOKEN #REQUIRED>
