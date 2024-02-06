@@ -9,11 +9,11 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 @Configuration
-public class CorsConfig {	//aula 23.41
+public class CorsConfig {	//aula 23.41, 27.3
 
 	@Bean
 	//public FilterRegistrationBean<CorsFilter> corsFilter() {
-		FilterRegistrationBean<CorsFilter> corsFilterRegistrationBean() {	//aula 23.41, "public "
+		FilterRegistrationBean<CorsFilter> corsFilterRegistrationBean() {	//aula 23.41	//public 
 		CorsConfiguration config = new CorsConfiguration();
 		config.setAllowCredentials(true);
 		config.setAllowedOrigins(Collections.singletonList("*"));

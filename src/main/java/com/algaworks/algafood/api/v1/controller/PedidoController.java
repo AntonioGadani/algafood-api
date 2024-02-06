@@ -1,27 +1,11 @@
 package com.algaworks.algafood.api.v1.controller;
-import java.util.Map;
-import javax.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.PagedModel;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.algaworks.algafood.api.v1.assembler.PedidoInputDisassembler;
 import com.algaworks.algafood.api.v1.assembler.PedidoModelAssembler;
 import com.algaworks.algafood.api.v1.assembler.PedidoResumoModelAssembler;
 import com.algaworks.algafood.api.v1.model.PedidoModel;
 import com.algaworks.algafood.api.v1.model.PedidoResumoModel;
 import com.algaworks.algafood.api.v1.model.input.PedidoInput;
+import com.algaworks.algafood.api.v1.openapi.controller.PedidoControllerOpenApi;
 import com.algaworks.algafood.core.data.PageWrapper;
 import com.algaworks.algafood.core.data.PageableTranslator;
 import com.algaworks.algafood.core.security.AlgaSecurity;
@@ -34,11 +18,22 @@ import com.algaworks.algafood.domain.model.Usuario;
 import com.algaworks.algafood.domain.repository.PedidoRepository;
 import com.algaworks.algafood.domain.service.EmissaoPedidoService;
 import com.algaworks.algafood.infrastructure.repository.spec.PedidoSpecs;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
+import java.util.Map;
 
 @RestController
-@RequestMapping(path = "/v1/pedidos")	//@RequestMapping(value = "/pedidos")	//aula 20.14
-public class PedidoController{	//aulas 12.19, 12.20, 12.21, 12.25, 13.2, 13.6, 19.16, 19.17, 20.14
-								//aulas 23.17, 23.29, 23.30, 23.31
+@RequestMapping(path = "/v1/pedidos", produces = MediaType.APPLICATION_JSON_VALUE)	//@RequestMapping(value = "/pedidos")	//aula 20.14
+public class PedidoController implements PedidoControllerOpenApi{	//aulas 12.19, 12.20, 12.21, 12.25, 13.2, 
+				                         //aulas 13.6, 19.16, 19.17, 20.14, 23.17, 23.29, 23.30, 23.31, 27.3
 	@Autowired
 	private PedidoRepository pedidoRepository;
 	
@@ -61,6 +56,7 @@ public class PedidoController{	//aulas 12.19, 12.20, 12.21, 12.25, 13.2, 13.6, 1
 	private AlgaSecurity algaSecurity;		//aula 23.17
 	
 	@CheckSecurity.Pedidos.PodePesquisar	//aula 23.30
+	@Override
 	@GetMapping
 	public PagedModel<PedidoResumoModel> pesquisar(PedidoFilter filtro,
             @PageableDefault(size = 10) Pageable pageable) {	//aula 19.17
@@ -74,17 +70,16 @@ public class PedidoController{	//aulas 12.19, 12.20, 12.21, 12.25, 13.2, 13.6, 1
 }
 	
 	@CheckSecurity.Pedidos.PodeCriar		//aula 23.31
+	@Override
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public PedidoModel adicionar(@Valid @RequestBody PedidoInput pedidoInput) {	//aula 12.21
 		try {
 			Pedido novoPedido = pedidoInputDisassembler.toDomainObject(pedidoInput);
-
 			novoPedido.setCliente(new Usuario());	// Todo dava warning pegar usuário autenticado
 			//novoPedido.getCliente().setId(1L);
 			novoPedido.getCliente().setId(algaSecurity.getUsuarioId());	//aula 23.17
 			novoPedido = emissaoPedido.emitir(novoPedido);
-
 			return pedidoModelAssembler.toModel(novoPedido);
 		} catch (EntidadeNaoEncontradaException e) {
 			throw new NegocioException(e.getMessage(), e);
@@ -92,6 +87,7 @@ public class PedidoController{	//aulas 12.19, 12.20, 12.21, 12.25, 13.2, 13.6, 1
 	}
 	
 	@CheckSecurity.Pedidos.PodeBuscar		//aula 23.29
+	@Override
 	@GetMapping("/{codigoPedido}")		//@GetMapping("/{pedidoId}")    aula 12.25
 	public PedidoModel buscar(@PathVariable String codigoPedido) {
 		Pedido pedido = emissaoPedido.buscarOuFalhar(codigoPedido);

@@ -1,18 +1,12 @@
 package com.algaworks.algafood.util;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.sql.DataSource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import javax.sql.DataSource;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class DatabaseCleaner {
@@ -24,7 +18,7 @@ public class DatabaseCleaner {
 
 	private Connection connection;
 
-	public void clearTables() {
+	public void clearTables() {		//aula 28.4
 		try (Connection connection = dataSource.getConnection()) {
 			this.connection = connection;
 			
@@ -61,7 +55,7 @@ public class DatabaseCleaner {
 			tableNames.add(rs.getString("TABLE_NAME"));
 		}
 
-		tableNames.remove("flyway_schema_history");//Não deletar conteúdo ho histórico flyway
+		tableNames.remove("flyway_schema_history");	//Não deletar conteúdo ho histórico flyway
 
 		return tableNames;
 	}
